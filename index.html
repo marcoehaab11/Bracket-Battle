@@ -1,291 +1,803 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>قرعة الفرق - هرمي</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      direction: rtl;
-      margin: 0;
-      padding: 0;
-      background-color: #f7f9fc;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-    header {
-      background-color: #1e88e5;
-      color: white;
-      width: 100%;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .container {
-      width: 90%;
-      max-width: 600px;
-      margin: 20px auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    }
-    textarea {
-      width: 100%;
-      height: 120px;
-      font-size: 16px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      resize: vertical;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    button {
-      padding: 10px 20px;
-      margin: 10px 5px 0;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .btn-primary {
-      background-color: #1e88e5;
-      color: white;
-    }
-    .btn-pdf {
-      background-color: #43a047;
-      color: white;
-    }
-    .btn-word {
-      background-color: #f9a825;
-      color: white;
-    }
-    .bracket {
-      margin-top: 20px;
-    }
-    .tree-container {
-      margin-top: 40px;
-      overflow-x: auto;
-      padding-bottom: 40px;
-    }
-    .tree {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 60px;
-      flex-wrap: nowrap;
-      position: relative;
-    }
-    .column {
-      display: flex;
-      flex-direction: column;
-      gap: 40px;
-      position: relative;
-    }
-    .node {
-      background: #e3f2fd;
-      padding: 10px 20px;
-      border-radius: 8px;
-      text-align: center;
-      min-width: 120px;
-      font-weight: bold;
-      position: relative;
-    }
-    .line {
-      position: absolute;
-      height: 2px;
-      background: #90caf9;
-      top: 50%;
-      right: -30px;
-      width: 30px;
-    }
-    .connector {
-      position: absolute;
-      width: 2px;
-      background: #90caf9;
-      right: -30px;
-    }
-    @media (max-width: 768px) {
-      .tree {
-        flex-direction: column;
-        align-items: center;
-        gap: 0;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> مولد قرعة البطولة</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+            text-align: right;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .input-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .bracket-container {
+            margin-top: 40px;
+            padding: 30px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        .bracket {
+            display: flex;
+            gap: 60px;
+            min-width: fit-content;
+            justify-content: center;
+        }
+
+        .round {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            min-height: 400px;
+        }
+
+        .round-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #495057;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .match {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .match:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .participant {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .participant:last-child {
+            border-bottom: none;
+        }
+
+        .participant:hover {
+            background-color: #f8f9fa;
+        }
+
+        .participant.bye {
+            background-color: #f1f3f4;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .participant.winner {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .input-section {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .bracket {
+                gap: 30px;
+            }
+
+            .bracket-container {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .bracket {
+                gap: 20px;
+            }
+
+            .round-title {
+                font-size: 1em;
+                padding: 8px;
+            }
+
+            .participant {
+                padding: 10px 15px;
+            }
+        }
+    </style>
 </head>
+
 <body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 مولد قرعة البطولة</h1>
+            <p>إنشاء أقواس بطولة احترافية بسهولة</p>
+        </div>
 
-<header>
-  <h2>برنامج قرعة الفرق - الشكل الهرمي</h2>
-</header>
+        <div class="main-content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="tournamentTitle">عنوان البطولة:</label>
+                    <input type="text" id="tournamentTitle" placeholder="أدخل اسم البطولة..." value="بطولة البطل 2025">
+                </div>
 
-<div class="container">
-  <!-- TextBox for the title -->
-  <input type="text" id="titleInput" placeholder="أدخل العنوان هنا...">
-  
-  <textarea id="teamsInput" placeholder="اكتب اسم كل فريق في سطر مستقل..."></textarea>
-  <br>
-  <button class="btn-primary" onclick="drawBracket()">🎯 اعمل القرعة</button>
-  <button class="btn-pdf" onclick="printToPDF()">🖨️ اطبع PDF</button>
-  <button class="btn-word" onclick="printToWord()">🖨️ اطبع Word</button>
+                <div class="input-group">
+                    <label for="participants">المشاركون (اسم واحد في كل سطر):</label>
+                    <textarea id="participants" placeholder="أدخل أسماء المشاركين، اسم واحد في كل سطر...
+مثال:
+الفريق الأول
+الفريق الثاني  
+الفريق الثالث
+الفريق الرابع"></textarea>
+                </div>
 
-  <div class="bracket" id="bracket"></div>
-  <div class="tree-container">
-    <div class="tree" id="tree"></div>
-  </div>
-</div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="generateDraw()">🎲 إنشاء القرعة</button>
+                    <!-- <button class="btn btn-secondary" onclick="generatePDF()">📄 تحميل PDF</button> -->
+                    <button class="btn btn-success" onclick="generateWord()">📝 تحميل Word</button>
+                </div>
+            </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- Include PizZip and docxtemplater -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.0.6/pizzip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.20.2/docxtemplater.min.js"></script>
+            <div id="result-message"></div>
+            <div id="bracket-display" class="hidden"></div>
 
-<script>
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
+            <!-- Written Format Section -->
+            <div id="written-format" class="hidden">
+                <div class="bracket-container">
+                    <h2 style="text-align: center; margin-bottom: 30px; color: #495057; font-size: 2em;">التسلسل الكتابي
+                        للبطولة</h2>
+                    <div id="written-content"
+                        style="background: #f8f9fa; padding: 30px; border-radius: 12px; border: 2px solid #e9ecef; line-height: 2; font-size: 16px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-function drawBracket() {
-  const input = document.getElementById("teamsInput").value.trim();
-  let teams = input.split('\n').map(t => t.trim()).filter(t => t);
-  const bracketDiv = document.getElementById("bracket");
-  const treeDiv = document.getElementById("tree");
-  const title = document.getElementById("titleInput").value.trim();  // Get title input
-  bracketDiv.innerHTML = '';
-  treeDiv.innerHTML = '';
+    <script>
+        let tournamentData = null;
 
-  if (teams.length < 2) {
-    bracketDiv.innerText = 'ادخل على الأقل فريقين.';
-    return;
-  }
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('result-message');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            messageDiv.style.display = 'block';
 
-  let nextPowerOf2 = 1;
-  while (nextPowerOf2 < teams.length) nextPowerOf2 *= 2;
-  while (teams.length < nextPowerOf2) {
-    teams.push("BYE");
-  }
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
 
-  shuffle(teams);
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
 
-  let round = 1;
-  let currentTeams = teams;
-  let rounds = [];
+        function generateDraw() {
+            const title = document.getElementById('tournamentTitle').value.trim();
+            const participantsText = document.getElementById('participants').value.trim();
 
-  // Add title to the bracket
-  if (title) {
-    const titleDiv = document.createElement("h3");
-    titleDiv.innerText = title;
-    bracketDiv.appendChild(titleDiv);
-  }
+            if (!title) {
+                showMessage('يرجى إدخال عنوان البطولة.', 'error');
+                return;
+            }
 
-  // Add participating teams
-  const participatingTeams = document.createElement("h4");
-  participatingTeams.innerText = `الفرق المشاركة: ${teams.join(', ')}`;
-  bracketDiv.appendChild(participatingTeams);
+            if (!participantsText) {
+                showMessage('يرجى إدخال أسماء المشاركين.', 'error');
+                return;
+            }
 
-  while (currentTeams.length >= 1) {
-    const roundDiv = document.createElement("div");
-    roundDiv.className = "round";
-    roundDiv.innerHTML = `<h3>الدور ${round}</h3>`;
+            let participants = participantsText.split('\n')
+                .map(name => name.trim())
+                .filter(name => name.length > 0);
 
-    let thisRound = [];
+            if (participants.length < 2) {
+                showMessage('يرجى إدخال مشاركين على الأقل.', 'error');
+                return;
+            }
 
-    for (let i = 0; i < currentTeams.length; i += 2) {
-      const team1 = currentTeams[i];
-      const team2 = currentTeams[i + 1];
-      const match = document.createElement("div");
-      match.className = "match";
-      match.innerText = `🔹 ${team1} × ${team2}`;
-      roundDiv.appendChild(match);
+            // Add BYE if odd number of participants
+            if (participants.length % 2 !== 0) {
+                participants.push('تأهل مباشر');
+                showMessage(`تم إضافة "تأهل مباشر" ليصبح العدد ${participants.length} مشاركين (رقم زوجي).`, 'success');
+            }
 
-      if (team1 === "BYE") {
-        thisRound.push(team2);
-      } else if (team2 === "BYE") {
-        thisRound.push(team1);
-      } else {
-        thisRound.push(`الفائز من (${team1} × ${team2})`);
-      }
-    }
+            // Shuffle participants randomly
+            participants = shuffleArray(participants);
 
-    bracketDiv.appendChild(roundDiv);
-    rounds.push(currentTeams);
+            // Generate tournament structure
+            tournamentData = {
+                title: title,
+                participants: participants,
+                rounds: generateRounds(participants)
+            };
 
-    if (thisRound.length === 1) {
-      const champ = document.createElement("h2");
-      champ.innerText = `🏆 البطل: ${thisRound[0]}`;
-      bracketDiv.appendChild(champ);
-      rounds.push([thisRound[0]]);
-      break;
-    }
+            displayBracket(tournamentData);
+            displayWrittenFormat(tournamentData);
+            showMessage('تم إنشاء قرعة البطولة بنجاح!', 'success');
+        }
 
-    currentTeams = thisRound;
-    round++;
-  }
+        function generateRounds(participants) {
+            const rounds = [];
+            let currentRound = [];
 
-  // Generate Tree View
-  for (let i = 0; i < rounds.length; i++) {
-    const column = document.createElement("div");
-    column.className = "column";
-    rounds[i].forEach(name => {
-      const node = document.createElement("div");
-      node.className = "node";
-      node.innerText = name;
-      if (i < rounds.length - 1) {
-        const line = document.createElement("div");
-        line.className = "line";
-        node.appendChild(line);
-      }
-      column.appendChild(node);
-    });
-    treeDiv.appendChild(column);
-  }
-}
+            // First round - pair up participants
+            for (let i = 0; i < participants.length; i += 2) {
+                currentRound.push({
+                    participant1: participants[i],
+                    participant2: participants[i + 1],
+                    winner: null
+                });
+            }
+            rounds.push(currentRound);
 
-// PDF Printing function
-function printToPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const content = document.getElementById("bracket").innerText;
-  doc.text(content, 10, 10);
-  doc.save('bracket.pdf');
-}
+            // Generate subsequent rounds
+            while (currentRound.length > 1) {
+                const nextRound = [];
+                for (let i = 0; i < currentRound.length; i += 2) {
+                    nextRound.push({
+                        participant1: `الفائز من المباراة ${i + 1}`,
+                        participant2: currentRound[i + 1] ? `الفائز من المباراة ${i + 2}` : 'تأهل مباشر',
+                        winner: null
+                    });
+                }
+                currentRound = nextRound;
+                rounds.push(nextRound);
+            }
 
-// Word Printing function
-function printToWord() {
-  const title = document.getElementById("titleInput").value.trim();
-  const teams = document.getElementById("teamsInput").value.trim().split('\n').map(t => t.trim()).filter(t => t);
-  const content = `
-    <h3>العنوان: ${title}</h3>
-    <h4>الفرق المشاركة: ${teams.join(', ')}</h4>
-    ${document.getElementById("bracket").innerHTML}
-  `;
-  
-  const zip = new PizZip();
-  const doc = new docxtemplater(zip);
-  const docxContent = doc.createContent();
-  
-  // Saving DOCX
-  const blob = docxContent.createBlob();
-  saveAs(blob, "bracket.docx");
-}
-</script>
+            return rounds;
+        }
 
+        function displayBracket(data) {
+            const bracketDisplay = document.getElementById('bracket-display');
+            bracketDisplay.innerHTML = '';
+            bracketDisplay.classList.remove('hidden');
+
+            const bracketContainer = document.createElement('div');
+            bracketContainer.className = 'bracket-container';
+
+            const title = document.createElement('h2');
+            title.textContent = data.title;
+            title.style.textAlign = 'center';
+            title.style.marginBottom = '30px';
+            title.style.color = '#495057';
+            title.style.fontSize = '2em';
+            bracketContainer.appendChild(title);
+
+            const bracket = document.createElement('div');
+            bracket.className = 'bracket';
+
+            data.rounds.forEach((round, roundIndex) => {
+                const roundDiv = document.createElement('div');
+                roundDiv.className = 'round';
+
+                const roundTitle = document.createElement('div');
+                roundTitle.className = 'round-title';
+
+                if (roundIndex === 0) {
+                    roundTitle.textContent = 'الدور الأول';
+                } else if (roundIndex === data.rounds.length - 1) {
+                    roundTitle.textContent = 'النهائي';
+                } else if (roundIndex === data.rounds.length - 2) {
+                    roundTitle.textContent = 'نصف النهائي';
+                } else {
+                    roundTitle.textContent = `الدور ${roundIndex + 1}`;
+                }
+
+                roundDiv.appendChild(roundTitle);
+
+                round.forEach((match, matchIndex) => {
+                    const matchDiv = document.createElement('div');
+                    matchDiv.className = 'match';
+
+                    const participant1Div = document.createElement('div');
+                    participant1Div.className = 'participant';
+                    participant1Div.textContent = match.participant1;
+                    if (match.participant1 === 'تأهل مباشر') {
+                        participant1Div.classList.add('bye');
+                    }
+
+                    const participant2Div = document.createElement('div');
+                    participant2Div.className = 'participant';
+                    participant2Div.textContent = match.participant2;
+                    if (match.participant2 === 'تأهل مباشر') {
+                        participant2Div.classList.add('bye');
+                    }
+
+                    matchDiv.appendChild(participant1Div);
+                    matchDiv.appendChild(participant2Div);
+                    roundDiv.appendChild(matchDiv);
+                });
+
+                bracket.appendChild(roundDiv);
+            });
+
+            bracketContainer.appendChild(bracket);
+            bracketDisplay.appendChild(bracketContainer);
+        }
+
+        function displayWrittenFormat(data) {
+            const writtenDisplay = document.getElementById('written-format');
+            const writtenContent = document.getElementById('written-content');
+            writtenContent.innerHTML = '';
+            writtenDisplay.classList.remove('hidden');
+
+            let content = `<h3 style="color: #667eea; margin-bottom: 20px; text-align: center;">${data.title}</h3>`;
+            content += `<p style="text-align: center; margin-bottom: 30px; color: #6c757d;">تاريخ القرعة: ${new Date().toLocaleDateString('ar-EG')}</p>`;
+
+            data.rounds.forEach((round, roundIndex) => {
+                let roundTitle;
+                if (roundIndex === 0) {
+                    roundTitle = 'الدور الأول';
+                } else if (roundIndex === data.rounds.length - 1) {
+                    roundTitle = 'المباراة النهائية';
+                } else if (roundIndex === data.rounds.length - 2) {
+                    roundTitle = 'دور نصف النهائي';
+                } else {
+                    roundTitle = `الدور ${roundIndex + 1}`;
+                }
+
+                content += `<div style="margin-bottom: 25px;">`;
+                content += `<h4 style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 15px;">${roundTitle}</h4>`;
+
+                round.forEach((match, matchIndex) => {
+                    content += `<div style="background: white; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #dee2e6;">`;
+                    content += `<strong>المباراة ${matchIndex + 1}:</strong><br>`;
+                    content += `${match.participant1} <strong>ضد</strong> ${match.participant2}<br>`;
+                    content += `<span style="color: #667eea;">الفائز: ___________________</span>`;
+                    content += `</div>`;
+                });
+
+                content += `</div>`;
+            });
+
+            writtenContent.innerHTML = content;
+        }
+
+        function generatePDF() {
+            if (!tournamentData) {
+                showMessage('يرجى إنشاء قرعة البطولة أولاً.', 'error');
+                return;
+            }
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                // Add Arabic font support (using a simple approach)
+                doc.addFileToVFS('Tajawal-Regular.ttf', 'base64_encoded_font');
+                doc.addFont('Tajawal-Regular.ttf', 'Tajawal', 'normal');
+                doc.setFont('Tajawal');  // Set the font to Tajawal
+
+                let yPosition = 20;
+
+                // Title (in Arabic characters for PDF compatibility)
+                doc.setFontSize(18);
+                doc.setFont(undefined, 'bold');
+                doc.text(tournamentData.title, 105, yPosition, { align: 'center' });
+                yPosition += 15;
+
+                // Date
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'normal');
+                doc.text(`Tournament Draw - ${new Date().toLocaleDateString()}`, 105, yPosition, { align: 'center' });
+                yPosition += 20;
+
+                // Hierarchical Format
+                doc.setFontSize(16);
+                doc.setFont(undefined, 'bold');
+                doc.text('Tournament Bracket Format:', 20, yPosition);
+                yPosition += 15;
+
+                tournamentData.rounds.forEach((round, roundIndex) => {
+                    // Round title
+                    doc.setFontSize(14);
+                    doc.setFont(undefined, 'bold');
+                    let roundTitle;
+                    if (roundIndex === 0) {
+                        roundTitle = 'الدور الأول';
+                    } else if (roundIndex === tournamentData.rounds.length - 1) {
+                        roundTitle = 'Final';
+                    } else if (roundIndex === tournamentData.rounds.length - 2) {
+                        roundTitle = 'Semi-Final';
+                    } else {
+                        roundTitle = `Round ${roundIndex + 1}`;
+                    }
+
+                    doc.text(roundTitle, 20, yPosition);
+                    yPosition += 10;
+
+                    // Matches
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+
+                    round.forEach((match, matchIndex) => {
+                        if (yPosition > 270) {
+                            doc.addPage();
+                            yPosition = 20;
+                        }
+
+                        doc.text(`Match ${matchIndex + 1}:`, 25, yPosition);
+                        yPosition += 5;
+
+                        let p1 = match.participant1.replace(/[\u0600-\u06FF]/g, '?');
+                        let p2 = match.participant2.replace(/[\u0600-\u06FF]/g, '?');
+
+                        if (match.participant1 === 'تأهل مباشر') p1 = 'BYE';
+                        if (match.participant2 === 'تأهل مباشر') p2 = 'BYE';
+                        if (match.participant1.includes('الفائز من المباراة')) {
+                            p1 = match.participant1.replace('الفائز من المباراة', 'Winner of Match');
+                        }
+                        if (match.participant2.includes('الفائز من المباراة')) {
+                            p2 = match.participant2.replace('الفائز من المباراة', 'Winner of Match');
+                        }
+
+                        doc.text(`${p1} vs ${p2}`, 30, yPosition);
+                        yPosition += 5;
+                        doc.text(`Winner: ___________________`, 30, yPosition);
+                        yPosition += 8;
+                    });
+
+                    yPosition += 5;
+                });
+
+                // Save the PDF
+                doc.save(`${tournamentData.title.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_')}_Tournament_Draw.pdf`);
+                showMessage('تم إنشاء وتحميل ملف PDF بنجاح!', 'success');
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                showMessage('خطأ في إنشاء ملف PDF. يرجى المحاولة مرة أخرى.', 'error');
+            }
+        }
+
+
+        function generateWord() {
+            if (!tournamentData) {
+                showMessage('يرجى إنشاء قرعة البطولة أولاً.', 'error');
+                return;
+            }
+
+            try {
+                // Create a comprehensive Word document structure
+                let docContent = `${tournamentData.title}\n`;
+                docContent += `${'='.repeat(tournamentData.title.length)}\n\n`;
+                docContent += `قرعة البطولة - تم الإنشاء في ${new Date().toLocaleDateString('ar-EG')}\n\n`;
+
+                // Hierarchical Format
+                docContent += `الشكل الهرمي للبطولة:\n`;
+                docContent += `${'='.repeat(25)}\n\n`;
+
+                tournamentData.rounds.forEach((round, roundIndex) => {
+                    let roundTitle;
+                    if (roundIndex === 0) {
+                        roundTitle = 'الدور الأول';
+                    } else if (roundIndex === tournamentData.rounds.length - 1) {
+                        roundTitle = 'المباراة النهائية';
+                    } else if (roundIndex === tournamentData.rounds.length - 2) {
+                        roundTitle = 'دور نصف النهائي';
+                    } else {
+                        roundTitle = `الدور ${roundIndex + 1}`;
+                    }
+
+                    docContent += `${roundTitle}\n`;
+                    docContent += `${'-'.repeat(roundTitle.length)}\n`;
+
+                    round.forEach((match, matchIndex) => {
+                        docContent += `المباراة ${matchIndex + 1}: ${match.participant1} ضد ${match.participant2}\n`;
+                        docContent += `الفائز: ___________________\n\n`;
+                    });
+
+                    docContent += `\n`;
+                });
+
+                // Written Format
+                docContent += `\n\nالتسلسل الكتابي للبطولة:\n`;
+                docContent += `${'='.repeat(30)}\n\n`;
+
+                tournamentData.rounds.forEach((round, roundIndex) => {
+                    let roundTitle;
+                    if (roundIndex === 0) {
+                        roundTitle = 'الدور الأول';
+                    } else if (roundIndex === tournamentData.rounds.length - 1) {
+                        roundTitle = 'المباراة النهائية';
+                    } else if (roundIndex === tournamentData.rounds.length - 2) {
+                        roundTitle = 'دور نصف النهائي';
+                    } else {
+                        roundTitle = `الدور ${roundIndex + 1}`;
+                    }
+
+                    docContent += `${roundTitle}:\n`;
+
+                    round.forEach((match, matchIndex) => {
+                        docContent += `• المباراة ${matchIndex + 1}: ${match.participant1} ضد ${match.participant2}\n`;
+                        docContent += `  الفائز: ___________________\n`;
+                    });
+
+                    docContent += `\n`;
+                });
+
+                // Add match schedule template
+                docContent += `\n\nجدول المباريات:\n`;
+                docContent += `${'='.repeat(20)}\n\n`;
+
+                tournamentData.rounds.forEach((round, roundIndex) => {
+                    let roundTitle;
+                    if (roundIndex === 0) {
+                        roundTitle = 'الدور الأول';
+                    } else if (roundIndex === tournamentData.rounds.length - 1) {
+                        roundTitle = 'المباراة النهائية';
+                    } else if (roundIndex === tournamentData.rounds.length - 2) {
+                        roundTitle = 'دور نصف النهائي';
+                    } else {
+                        roundTitle = `الدور ${roundIndex + 1}`;
+                    }
+
+                    docContent += `${roundTitle}:\n`;
+
+                    round.forEach((match, matchIndex) => {
+                        docContent += `المباراة ${matchIndex + 1}:\n`;
+                        docContent += `  الفريق الأول: ${match.participant1}\n`;
+                        docContent += `  الفريق الثاني: ${match.participant2}\n`;
+                        docContent += `  التوقيت: _____ التاريخ: _____\n`;
+                        docContent += `  النتيجة: _____ - _____\n`;
+                        docContent += `  الفائز: ___________________\n\n`;
+                    });
+                });
+
+                // Create and download the file
+                const element = document.createElement('a');
+                const file = new Blob([docContent], { type: 'text/plain;charset=utf-8' });
+                element.href = URL.createObjectURL(file);
+                element.download = `${tournamentData.title.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_')}_قرعة_البطولة.txt`;
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+
+                showMessage('تم إنشاء وتحميل مستند النص بنجاح!', 'success');
+            } catch (error) {
+                console.error('Text file generation error:', error);
+                showMessage('خطأ في إنشاء ملف النص. يرجى المحاولة مرة أخرى.', 'error');
+            }
+        }
+
+        // Add sample data on page load
+        window.addEventListener('load', function () {
+            const sampleParticipants = `الفريق الأول
+الفريق الثاني
+الفريق الثالث
+الفريق الرابع
+الفريق الخامس
+الفريق السادس`;
+            document.getElementById('participants').value = sampleParticipants;
+        });
+    </script>
 </body>
+
 </html>
