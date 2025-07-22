@@ -45,6 +45,14 @@
       border-radius: 8px;
       resize: vertical;
     }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
     button {
       padding: 10px 20px;
       margin: 10px 5px 0;
@@ -57,8 +65,12 @@
       background-color: #1e88e5;
       color: white;
     }
-    .btn-print {
+    .btn-pdf {
       background-color: #43a047;
+      color: white;
+    }
+    .btn-word {
+      background-color: #f9a825;
       color: white;
     }
     .bracket {
@@ -122,16 +134,25 @@
 </header>
 
 <div class="container">
+  <!-- TextBox for the title -->
+  <input type="text" id="titleInput" placeholder="أدخل العنوان هنا...">
+  
   <textarea id="teamsInput" placeholder="اكتب اسم كل فريق في سطر مستقل..."></textarea>
   <br>
   <button class="btn-primary" onclick="drawBracket()">🎯 اعمل القرعة</button>
-  <button class="btn-print" onclick="window.print()">🖨️ اطبع</button>
+  <button class="btn-pdf" onclick="printToPDF()">🖨️ اطبع PDF</button>
+  <button class="btn-word" onclick="printToWord()">🖨️ اطبع Word</button>
 
   <div class="bracket" id="bracket"></div>
   <div class="tree-container">
     <div class="tree" id="tree"></div>
   </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Include PizZip and docxtemplater -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.0.6/pizzip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.20.2/docxtemplater.min.js"></script>
 
 <script>
 function shuffle(array) {
@@ -146,6 +167,7 @@ function drawBracket() {
   let teams = input.split('\n').map(t => t.trim()).filter(t => t);
   const bracketDiv = document.getElementById("bracket");
   const treeDiv = document.getElementById("tree");
+  const title = document.getElementById("titleInput").value.trim();  // Get title input
   bracketDiv.innerHTML = '';
   treeDiv.innerHTML = '';
 
@@ -165,6 +187,18 @@ function drawBracket() {
   let round = 1;
   let currentTeams = teams;
   let rounds = [];
+
+  // Add title to the bracket
+  if (title) {
+    const titleDiv = document.createElement("h3");
+    titleDiv.innerText = title;
+    bracketDiv.appendChild(titleDiv);
+  }
+
+  // Add participating teams
+  const participatingTeams = document.createElement("h4");
+  participatingTeams.innerText = `الفرق المشاركة: ${teams.join(', ')}`;
+  bracketDiv.appendChild(participatingTeams);
 
   while (currentTeams.length >= 1) {
     const roundDiv = document.createElement("div");
@@ -222,6 +256,34 @@ function drawBracket() {
     });
     treeDiv.appendChild(column);
   }
+}
+
+// PDF Printing function
+function printToPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const content = document.getElementById("bracket").innerText;
+  doc.text(content, 10, 10);
+  doc.save('bracket.pdf');
+}
+
+// Word Printing function
+function printToWord() {
+  const title = document.getElementById("titleInput").value.trim();
+  const teams = document.getElementById("teamsInput").value.trim().split('\n').map(t => t.trim()).filter(t => t);
+  const content = `
+    <h3>العنوان: ${title}</h3>
+    <h4>الفرق المشاركة: ${teams.join(', ')}</h4>
+    ${document.getElementById("bracket").innerHTML}
+  `;
+  
+  const zip = new PizZip();
+  const doc = new docxtemplater(zip);
+  const docxContent = doc.createContent();
+  
+  // Saving DOCX
+  const blob = docxContent.createBlob();
+  saveAs(blob, "bracket.docx");
 }
 </script>
 
