@@ -400,49 +400,57 @@
             return shuffled;
         }
 
-        function generateDraw() {
-            const title = document.getElementById('tournamentTitle').value.trim();
-            const participantsText = document.getElementById('participants').value.trim();
+       function nextPowerOfTwo(n) {
+    return Math.pow(2, Math.ceil(Math.log2(n)));
+}
 
-            if (!title) {
-                showMessage('يرجى إدخال عنوان البطولة.', 'error');
-                return;
-            }
+function generateDraw() {
+    const title = document.getElementById('tournamentTitle').value.trim();
+    const participantsText = document.getElementById('participants').value.trim();
 
-            if (!participantsText) {
-                showMessage('يرجى إدخال أسماء المشاركين.', 'error');
-                return;
-            }
+    if (!title) {
+        showMessage('يرجى إدخال عنوان البطولة.', 'error');
+        return;
+    }
 
-            let participants = participantsText.split('\n')
-                .map(name => name.trim())
-                .filter(name => name.length > 0);
+    if (!participantsText) {
+        showMessage('يرجى إدخال أسماء المشاركين.', 'error');
+        return;
+    }
 
-            if (participants.length < 2) {
-                showMessage('يرجى إدخال مشاركين على الأقل.', 'error');
-                return;
-            }
+    let participants = participantsText.split('\n')
+        .map(name => name.trim())
+        .filter(name => name.length > 0);
 
-            // Add BYE if odd number of participants
-            if (participants.length % 2 !== 0) {
-                participants.push('تأهل مباشر');
-                showMessage(`تم إضافة "تأهل مباشر" ليصبح العدد ${participants.length} مشاركين (رقم زوجي).`, 'success');
-            }
+    if (participants.length < 2) {
+        showMessage('يرجى إدخال مشاركين على الأقل.', 'error');
+        return;
+    }
 
-            // Shuffle participants randomly
-            participants = shuffleArray(participants);
-
-            // Generate tournament structure
-            tournamentData = {
-                title: title,
-                participants: participants,
-                rounds: generateRounds(participants)
-            };
-
-            displayBracket(tournamentData);
-            displayWrittenFormat(tournamentData);
-            showMessage('تم إنشاء قرعة البطولة بنجاح!', 'success');
+    // Power-of-two logic
+    const desiredLength = nextPowerOfTwo(participants.length);
+    const byesNeeded = desiredLength - participants.length;
+    if (byesNeeded > 0) {
+        for (let i = 0; i < byesNeeded; i++) {
+            participants.push('تأهل مباشر');
         }
+        showMessage(`تم إضافة ${byesNeeded} "تأهل مباشر" ليصبح العدد ${desiredLength} مشاركين (عدد صحيح مناسب للجدول).`, 'success');
+    }
+
+    // Shuffle participants randomly
+    participants = shuffleArray(participants);
+
+    // Generate tournament structure
+    tournamentData = {
+        title: title,
+        participants: participants,
+        rounds: generateRounds(participants)
+    };
+
+    displayBracket(tournamentData);
+    displayWrittenFormat(tournamentData);
+    showMessage('تم إنشاء قرعة البطولة بنجاح!', 'success');
+}
 
         function generateRounds(participants) {
             const rounds = [];
